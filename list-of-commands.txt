@@ -1,0 +1,25 @@
+Slash Commands:
+/closereq
+/gifs
+/help
+/joint
+/joints
+/lenny
+/pastas
+/ping
+/requests
+/savejoint (prev. .roll)
+/savegif
+/savepasta
+/sendhelp
+/truth
+
+TODO: In the future I'd like to change to a single `/save {type}` command
+
+Dot-Extension Commands:
+.gif
+.pasta
+.request
+.spongebob
+.strain
+.weather
