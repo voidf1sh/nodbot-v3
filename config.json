@@ -2,6 +2,7 @@
 	"isDev": true,
 	"clientId": "513184762073055252",
 	"guildId": "868542949737246730",
+	"devChannelId": "868545469381480498",
 	"guildName": "NodBot",
 	"validExtensions": []
 }

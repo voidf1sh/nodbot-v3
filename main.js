@@ -17,6 +17,7 @@ client.once('ready', () => {
 	fn.startup.getPastaFiles(client);
 	fn.startup.getPotPhrases(client);
 	console.log('Ready!');
+	client.channels.fetch(config.devChannelId).then(channel => channel.send('Ready!'));
 });
 
 // slash-commands
