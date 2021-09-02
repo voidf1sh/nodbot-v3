@@ -1,9 +1,12 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const fn = require('../functions.js');
 
 module.exports = {
-	name: 'requests',
-	description: 'Get a list of the currently active requests.',
-	execute(message, file) {
-		fn.getActiveRequests(message);
-	}
-}
+	data: new SlashCommandBuilder()
+		.setName('requests')
+		.setDescription('Get a list of Active requests from the database'),
+	async execute(interaction) {
+		commandData.requests = fn.download.requests();
+		interaction.reply(fn.embeds.requests(commandData));
+	},
+};

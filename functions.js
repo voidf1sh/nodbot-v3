@@ -163,6 +163,21 @@ module.exports = {
 				.setDescription(commandData.content)
 				.setTimestamp()
 				.setFooter(commandData.author)]};
+		},
+		requests(commandData) {
+			let requestsEmbed = new Discord.MessageEmbed()
+				.setAuthor(commandData.command)
+				.setTimestamp()
+				.setFooter(commandData.author);
+			
+			for (const row of commandData.requests) {
+				requestsEmbed.addField({
+					name: `#${row.id} - ${row.author}`,
+					value: row.request
+				});
+			}
+
+			return { embeds: [requestsEmbed]};
 		}
 	},
 	help: {
@@ -224,6 +239,15 @@ module.exports = {
 		request(commandData) {
 			const query = `INSERT INTO requests (author, request, status) VALUES ('${commandData.author}','${commandData.args}','Active')`;
 			db.query(query);
+		}
+	},
+	download: {
+		requests() {
+			const query = `SELECT (id, author, request) FROM requests WHERE status = 'Active'`;
+			let requests;
+			db.query(query).then(res => {
+				return results;
+			}).catch(err => console.error(err));
 		}
 	},
 	weed: {
