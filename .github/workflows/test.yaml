@@ -6,9 +6,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Host: ${{secrets.HOST}}"
-      - run: echo "Username: ${{secrets.USERNAME}}"
-      - run: echo "Port: ${{secrets.PORT}}"
+      - run: echo "Host ${{secrets.HOST}}"
+      - run: echo "Username ${{secrets.USERNAME}}"
+      - run: echo "Port ${{secrets.PORT}}"
   deploy:
     runs-on: ubuntu-latest
     needs: test # this job depends on "test" having finished
