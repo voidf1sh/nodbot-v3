@@ -13,6 +13,7 @@ const config = require('./config.json');
 
 client.once('ready', () => {
 	fn.startup.getSlashCommands(client);
+	fn.startup.setvalidCommands(client);
 	fn.startup.getGifFiles(client);
 	fn.startup.getPastaFiles(client);
 	fn.startup.getPotPhrases(client);
@@ -39,7 +40,18 @@ client.on('interactionCreate', async interaction => {
 
 // dot-commands
 client.on('messageCreate', message => {
-    // TODO: Handling of dot-commands
+    // Some basic checking to prevent running unnecessary code
+	if (message.user.bot) return;
+	const commandData = fn.dot.getCommandData(message);
+	if (commandData.isValid && commandData.isCommand) {
+		try {
+			client.commands.get(commandData.command).execute(message, commandData);
+		}
+		catch (error) {
+			console.error(error);
+			message.reply('There was an error trying to execute that command.');
+		}
+	}
     return;
 });
 

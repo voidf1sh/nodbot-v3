@@ -13,6 +13,7 @@ const Discord = require('discord.js');
 const config = require('./config.json');
 const emoji = config.emoji;
 const slashCommandFiles = fs.readdirSync('./slash-commands/').filter(file => file.endsWith('.js'));
+const dotCommandFiles = fs.readdirSync('./dot-commands/').filter(file => file.endsWith('.js'));
 
 // PostgreSQL
 const pg = require('pg');
@@ -26,11 +27,16 @@ db.connect();
 
 module.exports = {
 	startup: {
-		setValidExtensions(client) {
+		setvalidCommands(client) {
 			for (const entry of client.commands.map(command => command.name)) {
-				config.validExtensions.push(entry);
+				config.validCommands.push(entry);
 			}
-			if (config.isDev) console.log(config.validExtensions);
+			if (config.isDev) console.log(config.validCommands);
+			// if (!client.validCommands) client.validCommands = new Discord.Collection();
+			// client.validCommands.clear();
+			// for (const entry of client.commands.map(command => command.name)) {
+			// 	client.validCommands.set()
+			// }
 		},
 		getSlashCommands(client) {
 			if (!client.slashCommands) client.slashCommands = new Discord.Collection();
@@ -42,7 +48,15 @@ module.exports = {
 				}
 			}
 			if (config.isDev) console.log(client.slashCommands);
-			if (config.isDev) console.log(slashCommandFiles);
+		},
+		getDotCommands(client) {
+			if (!client.dotCommands) client.dotCommands = new Discord.Collection();
+			client.dotCommands.clear();
+			for (const file of dotCommandFiles) {
+				const dotCommand = require(`./dot-commands/${file}`);
+				client.dotCommands.set(dotCommand.name, dotCommand);
+			}
+			if (config.isDev) console.log(client.dotCommands);
 		},
 		getGifFiles(client) {
 			if (!client.gifs) client.gifs = new Discord.Collection();
@@ -99,6 +113,32 @@ module.exports = {
 					.catch(err => console.error(err));
 			});
 		},
+	},
+	dot: {
+		getCommandData(message) {
+			let commandData = {};
+			// Split the message content at the final instance of a period
+			const finalPeriod = message.content.lastIndexOf('.');
+			if (finalPeriod < 0) {
+				commandData.isCommand = false;
+				return commandData;
+			}
+			commandData.isCommand = true;
+			commandData.args = message.content.slice(0,finalPeriod);
+			commandData.command = message.content.slice(finalPeriod).replace('.','').toLowerCase();
+			return this.checkCommand(commandData);
+		},
+		checkCommand(commandData) {
+			if (commandData.isCommand) {
+				const validCommands = require('./config.json').validCommands;
+				commandData.isValid = validCommands.includes(commandData.command);
+			}
+			else {
+				commandData.isValid = false;
+				console.error('Somehow a non-command made it to checkCommands()');
+			}
+			return commandData;
+		}
 	},
 	help: {
 		channel(interaction) {
