@@ -5,10 +5,14 @@ on: [push] # tells github to run this on any push to the repository
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      HOST: ${{secrets.HOST}}
+      USERNAME: ${{secrets.USERNAME}}
+      PORT: ${{secrets.PORT}}
     steps:
-      - run: echo "Host ${{secrets.HOST}}"
-      - run: echo "Username ${{secrets.USERNAME}}"
-      - run: echo "Port ${{secrets.PORT}}"
+      - run: echo "Host $HOST"
+      - run: echo "Username $USERNAME"
+      - run: echo "Port $PORT"
   deploy:
     runs-on: ubuntu-latest
     needs: test # this job depends on "test" having finished
