@@ -4,5 +4,5 @@
 	"guildId": "868542949737246730",
 	"devChannelId": "868545469381480498",
 	"guildName": "NodBot",
-	"validExtensions": []
+	"validCommands": []
 }

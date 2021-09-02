@@ -1,4 +1,4 @@
-const functions = require('../functions');
+const fn = require('../functions');
 const tenor = require('tenorjs').client({
     "Key": process.env.tenorAPIKey, // https://tenor.com/developer/keyregistration
     "Filter": "off", // "off", "low", "medium", "high", not case sensitive
@@ -19,20 +19,14 @@ module.exports = {
 					message.reply('Sorry I was unable to find a GIF of ' + commandData.args);
 					return;
 				};
-				const gifInfo = {
-					'name': commandData.args,
-					'embed_url': res[0].media[0].gif.url
-				};
-				message.reply(functions.createGifEmbed(gifInfo, message.author, `${commandData.args}.${commandData.command} - Tenor`));
+				commandData.embed_url = res[0].media[0].gif.url;
+				message.reply(fn.embeds.gif(commandData));
 			})
 			.catch(err => console.error(err));
 		} else {
 			// message.reply(commandData.args + ' requested by ' + message.author.username + '\n' + client.gifs.get(commandData.args).embed_url);
-			const gifInfo = {
-				'name': commandData.args,
-				'embed_url': client.gifs.get(commandData.args).embed_url
-			};
-			message.reply(functions.createGifEmbed(gifInfo, message.author, `${commandData.args}.${commandData.command} - Saved`));
+			commandData.embed_url = client.gifs.get(commandData.args).embed_url;
+			message.reply(fn.embeds.gif(commandData));
 		}
 	}
 }

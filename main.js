@@ -5,7 +5,19 @@ const token = process.env.TOKEN;
 
 // Discord.JS
 const { Client, Intents } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+	intents: [
+		'GUILDS',
+		'GUILD_MESSAGES',
+		'GUILD_MESSAGE_REACTIONS',
+		'DIRECT_MESSAGES',
+		'DIRECT_MESSAGE_REACTIONS'
+	],
+	partials: [
+		'CHANNEL',
+		'MESSAGE'
+	]
+});
 
 // Various imports
 const fn = require('./functions.js');
@@ -13,6 +25,7 @@ const config = require('./config.json');
 
 client.once('ready', () => {
 	fn.startup.getSlashCommands(client);
+	fn.startup.getDotCommands(client);
 	fn.startup.setvalidCommands(client);
 	fn.startup.getGifFiles(client);
 	fn.startup.getPastaFiles(client);
@@ -40,19 +53,20 @@ client.on('interactionCreate', async interaction => {
 
 // dot-commands
 client.on('messageCreate', message => {
-    // Some basic checking to prevent running unnecessary code
-	if (message.user.bot) return;
+	// Some basic checking to prevent running unnecessary code
+	if (message.author.bot) return;
 	const commandData = fn.dot.getCommandData(message);
+	console.log(commandData);
 	if (commandData.isValid && commandData.isCommand) {
 		try {
-			client.commands.get(commandData.command).execute(message, commandData);
+			client.dotCommands.get(commandData.command).execute(message, commandData);
 		}
 		catch (error) {
 			console.error(error);
 			message.reply('There was an error trying to execute that command.');
 		}
 	}
-    return;
+	return;
 });
 
 client.login(token);

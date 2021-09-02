@@ -28,7 +28,7 @@ db.connect();
 module.exports = {
 	startup: {
 		setvalidCommands(client) {
-			for (const entry of client.commands.map(command => command.name)) {
+			for (const entry of client.dotCommands.map(command => command.name)) {
 				config.validCommands.push(entry);
 			}
 			if (config.isDev) console.log(config.validCommands);
@@ -126,6 +126,7 @@ module.exports = {
 			commandData.isCommand = true;
 			commandData.args = message.content.slice(0,finalPeriod);
 			commandData.command = message.content.slice(finalPeriod).replace('.','').toLowerCase();
+			commandData.author = `${message.author.username}#${message.author.discriminator}`;
 			return this.checkCommand(commandData);
 		},
 		checkCommand(commandData) {
@@ -138,6 +139,30 @@ module.exports = {
 				console.error('Somehow a non-command made it to checkCommands()');
 			}
 			return commandData;
+		}
+	},
+	embeds: {
+		gif(commandData) {
+			return { embeds: [new Discord.MessageEmbed()
+				.setAuthor(`${commandData.args}.${commandData.command}`)
+				.setImage(commandData.embed_url)
+				.setTimestamp()
+				.setFooter(commandData.author)]};
+		},
+		pasta(commandData) {
+			return { embeds: [ new Discord.MessageEmbed()
+				.setAuthor(`${commandData.args}.${commandData.command}`)
+				.setDescription(commandData.content)
+				.setThumbnail(commandData.iconUrl)
+				.setTimestamp()
+				.setFooter(commandData.author)]};
+		},
+		text(commandData) {
+			return { embeds: [new Discord.MessageEmbed()
+				.setAuthor(commandData.command)
+				.setDescription(commandData.content)
+				.setTimestamp()
+				.setFooter(commandData.author)]};
 		}
 	},
 	help: {
@@ -192,6 +217,12 @@ module.exports = {
 		},
 		joint(content) {
 			const query = `INSERT INTO joints (content) VALUES ('${content}')`;
+			db.query(query);
+		}
+	},
+	upload: {
+		request(commandData) {
+			const query = `INSERT INTO requests (author, request, status) VALUES ('${commandData.author}','${commandData.args}','Active')`;
 			db.query(query);
 		}
 	},
