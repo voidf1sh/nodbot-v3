@@ -212,6 +212,38 @@ module.exports = {
 				.setTimestamp()
 				.setFooter(commandData.author)]};
 		},
+		pastas(commandData) {
+			const pastasArray = [];
+			const pastasEmbed = new Discord.MessageEmbed()
+				.setAuthor(commandData.command)
+				.setTimestamp()
+				.setFooter(commandData.author);
+
+			for (const row of commandData.pastas) {
+				pastasArray.push(`#${row.id} - ${row.name}.pasta`);
+			}
+
+			const pastasString = pastasArray.join('\n');
+			pastasEmbed.setDescription(pastasString);
+
+			return { embeds: [pastasEmbed] };
+		},
+		gifs(commandData) {
+			const gifsArray = [];
+			const gifsEmbed = new Discord.MessageEmbed()
+				.setAuthor(commandData.command)
+				.setTimestamp()
+				.setFooter(commandData.author);
+
+			for (const row of commandData.gifs) {
+				gifsArray.push(`#${row.id} - ${row.name}.gif`);
+			}
+
+			const gifsString = gifsArray.join('\n');
+			gifsEmbed.setDescription(gifsString);
+
+			return { embeds: [gifsEmbed] };
+		},
 		text(commandData) {
 			return { embeds: [new Discord.MessageEmbed()
 				.setAuthor(commandData.command)
@@ -334,6 +366,14 @@ module.exports = {
 	download: {
 		requests() {
 			const query = 'SELECT id, author, request FROM requests WHERE status = \'Active\'';
+			return db.query(query);
+		},
+		pastas() {
+			const query = 'SELECT * FROM pastas ORDER BY id ASC';
+			return db.query(query);
+		},
+		gifs() {
+			const query = 'SELECT * FROM gifs ORDER BY id ASC';
 			return db.query(query);
 		},
 	},

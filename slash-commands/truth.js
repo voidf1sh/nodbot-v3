@@ -1,7 +1,11 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const fn = require('../functions.js');
+
 module.exports = {
-	name: "truth",
-	description: "The truth about MHFS",
-	execute(message, args) {
-		message.reply("https://www.twitch.tv/hochmania/clip/EsteemedSlickDootStinkyCheese-hncmP8aIP8_WQb_a?filter=clips&range=all&sort=time");
-	}
-}
+	data: new SlashCommandBuilder()
+		.setName('truth')
+		.setDescription('The truth about the MHallihan Flight Simulator'),
+	async execute(interaction) {
+		await interaction.reply('https://www.twitch.tv/hochmania/clip/EsteemedSlickDootStinkyCheese-hncmP8aIP8_WQb_a?filter=clips&range=all&sort=time');
+	},
+};

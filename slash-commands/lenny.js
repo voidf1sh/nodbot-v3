@@ -1,9 +1,11 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const fn = require('../functions.js');
 
 module.exports = {
-	name: 'lenny',
-	description: '( ͡° ͜ʖ ͡°)',
-	execute(message, file) {
-		message.reply('( ͡° ͜ʖ ͡°)');
-	}
-}
+	data: new SlashCommandBuilder()
+		.setName('lenny')
+		.setDescription('( ͡° ͜ʖ ͡°)'),
+	async execute(interaction) {
+		await interaction.reply('( ͡° ͜ʖ ͡°)');
+	},
+};

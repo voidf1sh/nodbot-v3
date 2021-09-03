@@ -1,12 +1,26 @@
-const functions = require('../functions.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { config } = require('dotenv');
+const fn = require('../functions.js');
 
 module.exports = {
-	name: 'pastas',
-	description: 'Get a list of saved copypastas',
-	execute(message, file) {
-		message.author.createDM().then(channel => {
-			channel.send(functions.createPastaList(message));
-			message.reply('I\'ve sent you a DM with a list of saved copypastas.')
-		}).catch(err => message.reply('Sorry I was unable to send you a DM.'));
-	}
-}
+	data: new SlashCommandBuilder()
+		.setName('pastas')
+		.setDescription('Get a list of currently saved copypastas.'),
+	async execute(interaction) {
+		fn.download.pastas().then(res => {
+			if (config.isDev) console.log(res.rows);
+			const commandData = {
+				author: interaction.user.tag,
+				command: interaction.commandName,
+				pastas: [],
+			};
+			for (const row of res.rows) {
+				commandData.pastas.push({
+					id: row.id,
+					name: row.name,
+				});
+			}
+			interaction.reply(fn.embeds.pastas(commandData));
+		});
+	},
+};
