@@ -6,12 +6,17 @@ module.exports = {
 	execute(message, commandData) {
 		fn.weed.strain.lookup(commandData.args).then(res => {
 			const row = res.rows[0];
+			if (row == undefined) {
+				commandData.content = 'I was unable to find that strain, could there be a typo?';
+				message.reply(fn.embeds.text(commandData));
+				return;
+			}
 			commandData.strainInfo = {
-				name: row.name,
-				type: row.type,
-				effects: row.effects,
-				ailments: row.ailments,
-				flavor: row.flavor,
+				name: `${row.name}`,
+				type: `${row.type}`,
+				effects: `${row.effects}`,
+				ailments: `${row.ailments}`,
+				flavor: `${row.flavor}`,
 			};
 			message.reply(fn.embeds.strain(commandData));
 		});

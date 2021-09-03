@@ -188,26 +188,26 @@ module.exports = {
 			strainEmbed.addFields([
 				{
 					name: 'Strain Name',
-					value: strainInfo.name,
+					value: `${strainInfo.name}`,
 				},
 				{
 					name: 'Type',
-					value: strainInfo.type,
+					value: `${strainInfo.type}`,
 					inline: true,
 				},
 				{
 					name: 'Effects',
-					value: strainInfo.effects,
+					value: `${strainInfo.effects}`,
 					inline: true,
 				},
 				{
 					name: 'Treats',
-					value: strainInfo.ailments,
+					value: `${strainInfo.ailments}`,
 					inline: true,
 				},
 				{
 					name: 'Flavor',
-					value: strainInfo.flavor,
+					value: `${strainInfo.flavor}`,
 					inline: true,
 				},
 			]);
@@ -285,7 +285,7 @@ module.exports = {
 	weed: {
 		strain: {
 			lookup(strainName) {
-				const query = `SELECT * FROM strains WHERE name LIKE ${strainName}`;
+				const query = `SELECT name, type, effects, ailment, flavor, similarity(name, '${strainName}') FROM strains ORDER BY 6 DESC LIMIT 1`;
 				return db.query(query);
 			},
 			submit(strainName) {
