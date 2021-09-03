@@ -12,6 +12,7 @@ module.exports = {
 				return;
 			}
 			commandData.strainInfo = {
+				id: `${row.id}`,
 				name: `${row.name}`,
 				type: `${row.type}`,
 				effects: `${row.effects}`,

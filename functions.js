@@ -181,7 +181,7 @@ module.exports = {
 		},
 		strain(commandData) {
 			const strainEmbed = new Discord.MessageEmbed()
-				.setAuthor(commandData.command)
+				.setAuthor(`${commandData.command} #${commandData.strainInfo.id}`)
 				.setTimestamp()
 				.setFooter(commandData.author);
 			const { strainInfo } = commandData;
@@ -285,7 +285,7 @@ module.exports = {
 	weed: {
 		strain: {
 			lookup(strainName) {
-				const query = `SELECT name, type, effects, ailment, flavor, similarity(name, '${strainName}') FROM strains ORDER BY 6 DESC LIMIT 1`;
+				const query = `SELECT id, name, type, effects, ailment, flavor, similarity(name, '${strainName}') FROM strains ORDER BY 7 DESC LIMIT 1`;
 				return db.query(query);
 			},
 			submit(strainName) {
