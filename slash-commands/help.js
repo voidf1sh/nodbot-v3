@@ -14,11 +14,11 @@ module.exports = {
 	async execute(interaction) {
 		switch (interaction.options.getString('location')) {
 		case 'channel':
-			await interaction.reply(fn.help.channel());
+			await interaction.reply(fn.embeds.help(interaction));
 			break;
 		case 'dm':
 			await interaction.user.createDM().then(channel => {
-				channel.send(fn.help.dm());
+				channel.send(fn.embeds.help(interaction));
 				interaction.reply('I\'ve sent you a copy of my help page.');
 			});
 			break;
@@ -26,6 +26,5 @@ module.exports = {
 			interaction.reply('There was an error, please try again.');
 			break;
 		}
-		
 	},
 };

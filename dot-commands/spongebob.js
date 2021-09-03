@@ -4,7 +4,7 @@ const config = require('../config.json');
 module.exports = {
 	name: 'spongebob',
 	description: 'SpOnGeBoB-iFy AnYtHiNg AuToMaTiCaLly',
-	usage: '<text to convert>',
+	usage: '<text to convert>.spongebob',
 	execute(message, commandData) {
 		let flipper = 0;
 		let newText = '';

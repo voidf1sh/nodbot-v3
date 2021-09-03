@@ -11,7 +11,7 @@ const Discord = require('discord.js');
 
 // Various imports
 const config = require('./config.json');
-const emoji = config.emoji;
+const strings = require('./strings.json');
 const slashCommandFiles = fs.readdirSync('./slash-commands/').filter(file => file.endsWith('.js'));
 const dotCommandFiles = fs.readdirSync('./dot-commands/').filter(file => file.endsWith('.js'));
 
@@ -142,6 +142,61 @@ module.exports = {
 		}
 	},
 	embeds: {
+		help(interaction) {
+			// Construct the Help Embed
+			const helpEmbed = new Discord.MessageEmbed()
+				.setColor('BLUE')
+				.setAuthor('Help Page')
+				.setDescription(strings.help.description)
+				.setThumbnail(strings.urls.avatar);
+
+			// Construct the Slash Commands help
+
+			let slashCommandsFields = [];
+
+			const slashCommandsMap = interaction.client.slashCommands.map(e => {
+				return {
+					name: e.data.name,
+					description: e.data.description
+				};
+			})
+
+			for (const e of slashCommandsMap) {
+				slashCommandsFields.push({
+					name: `- /${e.name}`,
+					value: e.description,
+					inline: false,
+				});
+			}
+
+			// Construct the Dot Commands Help
+			let dotCommandsFields = [];
+
+			const dotCommandsMap = interaction.client.dotCommands.map(e => {
+				return {
+					name: e.name,
+					description: e.description,
+					usage: e.usage
+				};
+			});
+
+			for (const e of dotCommandsMap) {
+				dotCommandsFields.push({
+					name: `- .${e.name}`,
+					value: `${e.description}\nUsage: ${e.usage}`,
+					inline: false,
+				});
+			}
+
+			helpEmbed.addField('Slash Commands', strings.help.slash);
+			helpEmbed.addFields(slashCommandsFields);
+			helpEmbed.addField('Dot Commands', strings.help.dot);
+			helpEmbed.addFields(dotCommandsFields);
+
+			return { embeds: [
+				helpEmbed
+			]};
+		},
 		gif(commandData) {
 			return { embeds: [new Discord.MessageEmbed()
 				.setAuthor(`${commandData.args}.${commandData.command}`)

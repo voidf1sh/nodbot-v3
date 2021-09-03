@@ -2,7 +2,8 @@ const fn = require('../functions');
 
 module.exports = {
 	name: 'strain',
-	description: 'Search for information about a cannabis strain. Powered by Otreeba',
+	description: 'Search for information about a cannabis strain.',
+	usage: '<strain name>.strain',
 	execute(message, commandData) {
 		fn.weed.strain.lookup(commandData.args).then(res => {
 			const row = res.rows[0];

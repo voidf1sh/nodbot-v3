@@ -3,7 +3,7 @@ const fn = require('../functions.js');
 module.exports = {
 	name: 'pasta',
 	description: 'Send a copypasta.',
-	usage: '<Copypasta Name>',
+	usage: '<Copypasta Name>.pasta',
 	execute(message, commandData) {
 		const client = message.client;
 		let replyBody = '';

@@ -3,7 +3,7 @@ const fn = require('../functions.js');
 module.exports = {
 	name: 'request',
 	description: 'Submit a request to the bot developer.',
-	usage: '<request or feedback>',
+	usage: '<request or feedback>.request',
 	execute(message, commandData) {
 		const request = commandData.args;
 		commandData.content = `Your request has been submitted!\nRequest: ${request}`;

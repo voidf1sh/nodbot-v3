@@ -10,7 +10,7 @@ const tenor = require('tenorjs').client({
 module.exports = {
 	name: 'gif',
 	description: 'Send a GIF',
-	usage: '<GIF name or Search Query>',
+	usage: '<GIF name or Search Query>.gif',
 	execute(message, commandData) {
 		const client = message.client;
 		if (!client.gifs.has(commandData.args)) {
