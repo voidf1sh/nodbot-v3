@@ -16,7 +16,7 @@ module.exports = {
 				name: `${row.name}`,
 				type: `${row.type}`,
 				effects: `${row.effects}`,
-				ailments: `${row.ailments}`,
+				ailments: `${row.ailment}`,
 				flavor: `${row.flavor}`,
 			};
 			message.reply(fn.embeds.strain(commandData));
