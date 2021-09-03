@@ -57,6 +57,11 @@ client.on('interactionCreate', async interaction => {
 client.on('messageCreate', message => {
 	// Some basic checking to prevent running unnecessary code
 	if (message.author.bot) return;
+
+	// Wildcard Responses, will respond if any message contains the trigger word(s), excluding self-messages
+	if (message.content.includes('big') && message.content.includes('doinks')) message.reply('gang.');
+	if (message.content.includes('ligma')) message.reply('ligma balls, goteem');
+
 	const commandData = fn.dot.getCommandData(message);
 	console.log(commandData);
 	if (commandData.isValid && commandData.isCommand) {

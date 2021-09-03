@@ -178,7 +178,42 @@ module.exports = {
 			}
 
 			return { embeds: [requestsEmbed]};
-		}
+		},
+		strain(commandData) {
+			const strainEmbed = new Discord.MessageEmbed()
+				.setAuthor(commandData.command)
+				.setTimestamp()
+				.setFooter(commandData.author);
+			const { strainInfo } = commandData;
+			strainEmbed.addFields([
+				{
+					name: 'Strain Name',
+					value: strainInfo.name,
+				},
+				{
+					name: 'Type',
+					value: strainInfo.type,
+					inline: true,
+				},
+				{
+					name: 'Effects',
+					value: strainInfo.effects,
+					inline: true,
+				},
+				{
+					name: 'Treats',
+					value: strainInfo.ailments,
+					inline: true,
+				},
+				{
+					name: 'Flavor',
+					value: strainInfo.flavor,
+					inline: true,
+				},
+			]);
+
+			return { embeds: [ strainEmbed ]};
+		},
 	},
 	help: {
 		channel(interaction) {
@@ -245,16 +280,13 @@ module.exports = {
 		requests() {
 			const query = 'SELECT id, author, request FROM requests WHERE status = \'Active\'';
 			return db.query(query);
-		}
+		},
 	},
 	weed: {
 		strain: {
 			lookup(strainName) {
 				const query = `SELECT * FROM strains WHERE name LIKE ${strainName}`;
-				const results = db.query(query).then(res => {
-					return res;
-				});
-				console.log(results);
+				return db.query(query);
 			},
 			submit(strainName) {
 				return strainName;
