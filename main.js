@@ -1,3 +1,5 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable indent */
 // dotenv for handling environment variables
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,17 +13,19 @@ const client = new Client({
 		'GUILD_MESSAGES',
 		'GUILD_MESSAGE_REACTIONS',
 		'DIRECT_MESSAGES',
-		'DIRECT_MESSAGE_REACTIONS'
+		'DIRECT_MESSAGE_REACTIONS',
 	],
 	partials: [
 		'CHANNEL',
-		'MESSAGE'
-	]
+		'MESSAGE',
+	],
 });
+const { MessageActionRow, MessageButton } = require('discord.js');
 
 // Various imports
 const fn = require('./functions.js');
 const config = require('./config.json');
+const strings = require('./strings.json');
 
 client.once('ready', () => {
 	fn.startup.getSlashCommands(client);
@@ -38,18 +42,89 @@ client.once('ready', () => {
 
 // slash-commands
 client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
+	if (interaction.isCommand()) {
+		if (config.isDev) {
+			console.log(interaction);
+		}
+		const { commandName } = interaction;
 
-	if (config.isDev) {
-		console.log(interaction);
+		if (client.slashCommands.has(commandName)) {
+			client.slashCommands.get(commandName).execute(interaction);
+		} else {
+			interaction.reply('Sorry, I don\'t have access to that command.');
+			console.error('Slash command attempted to run but not found: ' + commandName);
+		}
 	}
-	const { commandName } = interaction;
 
-	if (client.slashCommands.has(commandName)) {
-		client.slashCommands.get(commandName).execute(interaction);
-	} else {
-		interaction.reply('Sorry, I don\'t have access to that command.');
-		console.error('Slash command attempted to run but not found: ' + commandName);
+	if (interaction.isButton()) {
+		// Get some meta info from strings
+		const index = strings.temp.gifIndex;
+		const limit = strings.temp.gifLimit;
+		const buttonId = interaction.component.customId;
+		switch (buttonId) {
+			case 'prevGif':
+				interaction.editReply('prevGif was pressed');
+				break;
+			case 'confirmGif':
+				interaction.update('confirmGif was pressed.');
+				break;
+			case 'nextGif':
+				let newIndex;
+				if (index < limit) {
+					newIndex = index + 1;
+					strings.temp.gifIndex = newIndex;
+				}
+				if (index == 0) {
+					// Previous GIF button
+					const prevButton = new MessageButton().setCustomId('previousGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled(false);
+					// Confirm GIF Button
+					const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY');
+					// Next GIF Button
+					const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY');
+					// Cancel Button
+					const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Cancel').setStyle('DANGER');
+					// Put all the above into an ActionRow to be sent as a component of the reply
+					const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
+
+					interaction.update({ content: strings.temp.gifs[newIndex].embed_url, components: [row] });
+					break;
+				}
+				if (newIndex == strings.temp.gifLimit) {
+					// Previous GIF button
+					const prevButton = new MessageButton().setCustomId('previousGif').setLabel('Previous GIF').setStyle('SECONDARY');
+					// Confirm GIF Button
+					const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY');
+					// Next GIF Button
+					const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY').setDisabled();
+					// Cancel Button
+					const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Canceled').setStyle('DANGER');
+					// Put all the above into an ActionRow to be sent as a component of the reply
+					const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
+
+					interaction.update({ content: strings.temp.gifs[newIndex].embed_url, components: [row] });
+					break;
+				}
+
+				interaction.update(strings.temp.gifs[newIndex].embed_url);
+				break;
+			case 'cancelGif':
+				// Previous GIF button
+				const prevButton = new MessageButton().setCustomId('previousGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled();
+				// Confirm GIF Button
+				const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY').setDisabled();
+				// Next GIF Button
+				const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY').setDisabled();
+				// Cancel Button
+				const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Canceled').setStyle('DANGER');
+				// Put all the above into an ActionRow to be sent as a component of the reply
+				const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
+				interaction.component.setDisabled(true);
+
+				interaction.update({ content: 'Canceled.', components: [row] });
+				break;
+			default:
+				break;
+		}
 	}
 });
 

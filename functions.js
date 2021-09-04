@@ -302,46 +302,6 @@ module.exports = {
 			return { embeds: [ strainEmbed ]};
 		},
 	},
-	help: {
-		channel(interaction) {
-			const { slashCommands } = interaction.client;
-			let fields = [];
-			for (const entry of commands.map(command => [command.name, command.description, command.usage])) {
-				const name = entry[0];
-				const description = entry[1];
-				let usage;
-				if (entry[2] == undefined) {
-					usage = '';
-				} else {
-					usage = entry[2];
-				}
-				const excludeList = [
-					'kill',
-					'mapcommands',
-					'newgif',
-					'newpng',
-					'oldgif',
-					'strain',
-					'stonk',
-					'wrongbad'
-				];
-				if (excludeList.includes(name)) continue;
-				fields.push({
-					name: name,
-					value: `${description}\n**Usage:** \`${usage}.${name}\``
-				});
-			}
-
-			return {embeds: [new Discord.MessageEmbed()
-				.setAuthor('NodBot Help')
-				.setDescription('All commands are provided as "file extensions" instead of prefixes to the message.')
-				.addFields(fields)
-				.setTimestamp()]};
-		},
-		dm(interaction) {
-			return;
-		}
-	},
 	save: {
 		gif(name, embed_url) {
 			const query = `INSERT INTO gifs (name, embed_url) VALUES ('${name}', '${embed_url}')`;
@@ -361,7 +321,15 @@ module.exports = {
 		request(commandData) {
 			const query = `INSERT INTO requests (author, request, status) VALUES ('${commandData.author}','${commandData.args}','Active')`;
 			db.query(query);
-		}
+		},
+		pasta(pastaData) {
+			const query = `INSERT INTO pastas (name, content) VALUES ('${pastaData.name}','${pastaData.content}')`;
+			return db.query(query);
+		},
+		joint(content) {
+			const query = `INSERT INTO potphrases (content) VALUES ('${content}')`;
+			return db.query(query);
+		},
 	},
 	download: {
 		requests() {
