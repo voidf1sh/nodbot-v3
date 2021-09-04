@@ -57,6 +57,7 @@ client.on('interactionCreate', async interaction => {
 	}
 
 	if (interaction.isButton()) {
+		if (interaction.user.id != strings.temp.gifUserId) return;
 		// Get some meta info from strings
 		const index = strings.temp.gifIndex;
 		const limit = strings.temp.gifLimit;

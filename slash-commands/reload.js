@@ -6,12 +6,12 @@ module.exports = {
 		.setName('reload')
 		.setDescription('Reload all saved content, useful if saving something fails.'),
 	async execute(interaction) {
-		fn.startup.getSlashCommands(client);
-		fn.startup.getDotCommands(client);
-		fn.startup.setvalidCommands(client);
-		fn.startup.getGifFiles(client);
-		fn.startup.getPastaFiles(client);
-		fn.startup.getPotPhrases(client);
+		fn.startup.getSlashCommands(interaction.client);
+		fn.startup.getDotCommands(interaction.client);
+		fn.startup.setvalidCommands(interaction.client);
+		fn.startup.getGifFiles(interaction.client);
+		fn.startup.getPastaFiles(interaction.client);
+		fn.startup.getPotPhrases(interaction.client);
 		interaction.reply('Reloaded!');
 	},
 };

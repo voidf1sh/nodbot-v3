@@ -39,6 +39,7 @@ module.exports = {
 			strings.temp.gifs = [];
 			strings.temp.gifIndex = 0;
 			strings.temp.gifLimit = res.length - 1;
+			strings.temp.gifUserId = interaction.user.id;
 
 			if (res[0] == undefined) {
 				interaction.reply('Sorry I was unable to find a GIF of ' + query);

@@ -19,9 +19,9 @@ const dotCommandFiles = fs.readdirSync('./dot-commands/').filter(file => file.en
 const pg = require('pg');
 const db = new pg.Client({
 	connectionString: process.env.DATABASE_URL,
-	ssl: {
-		rejectUnauthorized: false
-	}
+	// ssl: {
+	// 	rejectUnauthorized: false
+	// }
 });
 db.connect();
 
@@ -299,8 +299,8 @@ module.exports = {
 	},
 	collect: {
 		gifName(interaction) {
-			const gifNameFilter = m => m.author.id == interaction.user.id;
-			return interaction.channel.createMessageCollector({ gifNameFilter, time: 30000 });
+			const gifNameFilter = m => m.author.id == strings.temp.gifUserId;
+			return interaction.channel.createMessageCollector({ filter: gifNameFilter, time: 30000 });
 		},
 	},
 	upload: {

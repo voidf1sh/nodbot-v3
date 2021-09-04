@@ -6,6 +6,6 @@ module.exports = {
 		.setName('lenny')
 		.setDescription('( ͡° ͜ʖ ͡°)'),
 	async execute(interaction) {
-		await interaction.reply('( ͡° ͜ʖ ͡°)');
+		await interaction.channel.send('( ͡° ͜ʖ ͡°)');
 	},
 };
