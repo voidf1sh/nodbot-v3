@@ -8,9 +8,9 @@ Slash Commands: [* means updated]
 */pastas*
 */ping*
 */requests*
-/savejoint (prev. .roll)
+*/savejoint (prev. .roll)
 /savegif
-/savepasta
+*/savepasta
 */truth
 
 TODO: In the future I'd like to change to a single `/save {type}` command

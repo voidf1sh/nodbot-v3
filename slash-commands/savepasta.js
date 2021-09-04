@@ -1,19 +1,25 @@
-const functions = require('../functions.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const fn = require('../functions.js');
 
 module.exports = {
-	name: 'savepasta',
-	description: 'Saves a copypasta as pasta_name.pasta, just send the pasta name on the first message, and the bot will ask for the actual pasta afterwards.',
-	usage: '<Pasta Name>',
-	execute(message, file) {
-		message.reply(`I'll be saving the next message you send as ${file.name}.pasta\nWhat is the content of the copypasta?`)
-			.then(promptMessage => {
-				const pastaFilter = pastaMessage => pastaMessage.author == message.author;
-				const pastaCollector = promptMessage.channel.createMessageCollector(pastaFilter, { time: 30000, max: 1 });
-
-				pastaCollector.on('collect', pastaMessage => {
-					message.reply(functions.savePasta(message, file.name.toLowerCase(), functions.cleanInput(pastaMessage.content)));
-				})
-			})
-			.catch(err => console.error(err));
-	}
-} 
+	data: new SlashCommandBuilder()
+		.setName('savepasta')
+		.setDescription('Save a copypasta!')
+		.addStringOption(option =>
+			option.setName('pasta-name')
+				.setDescription('What should the name of the copypasta be?')
+				.setRequired(true))
+		.addStringOption(option =>
+			option.setName('pasta-content')
+				.setDescription('What is the content of the copypasta?')
+				.setRequired(true)),
+	async execute(interaction) {
+		const pastaData = {
+			name: interaction.options.getString('pasta-name'),
+			content: interaction.options.getString('pasta-content'),
+		};
+		fn.upload.pasta(pastaData);
+		fn.startup.getPastaFiles(interaction.client);
+		interaction.reply(`The copypasta has been saved as ${pastaData.name}.pasta`);
+	},
+};
