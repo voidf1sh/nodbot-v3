@@ -32,11 +32,6 @@ module.exports = {
 				config.validCommands.push(entry);
 			}
 			if (config.isDev) console.log(config.validCommands);
-			// if (!client.validCommands) client.validCommands = new Discord.Collection();
-			// client.validCommands.clear();
-			// for (const entry of client.commands.map(command => command.name)) {
-			// 	client.validCommands.set()
-			// }
 		},
 		getSlashCommands(client) {
 			if (!client.slashCommands) client.slashCommands = new Discord.Collection();
@@ -302,25 +297,16 @@ module.exports = {
 			return { embeds: [ strainEmbed ]};
 		},
 	},
-	save: {
-		gif(name, embed_url) {
-			const query = `INSERT INTO gifs (name, embed_url) VALUES ('${name}', '${embed_url}')`;
-			db.query(query);
-			this.startup.getGifFiles(); 
+	collect: {
+		gifName(interaction) {
+			const gifNameFilter = m => m.author.id == interaction.user.id;
+			return interaction.channel.createMessageCollector({ gifNameFilter, time: 30000 });
 		},
-		pasta(name, content) {
-			const query = `INSERT INTO pastas (name, content) VALUES ('${name}', '${content}')`;
-			db.query(query);
-		},
-		joint(content) {
-			const query = `INSERT INTO joints (content) VALUES ('${content}')`;
-			db.query(query);
-		}
 	},
 	upload: {
 		request(commandData) {
 			const query = `INSERT INTO requests (author, request, status) VALUES ('${commandData.author}','${commandData.args}','Active')`;
-			db.query(query);
+			return db.query(query);
 		},
 		pasta(pastaData) {
 			const query = `INSERT INTO pastas (name, content) VALUES ('${pastaData.name}','${pastaData.content}')`;
@@ -330,6 +316,10 @@ module.exports = {
 			const query = `INSERT INTO potphrases (content) VALUES ('${content}')`;
 			return db.query(query);
 		},
+		gif(gifData) {
+			const query = `INSERT INTO gifs (name, embed_url) VALUES ('${gifData.name}', '${gifData.embed_url}')`;
+			return db.query(query);
+		}
 	},
 	download: {
 		requests() {

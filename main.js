@@ -60,28 +60,21 @@ client.on('interactionCreate', async interaction => {
 		// Get some meta info from strings
 		const index = strings.temp.gifIndex;
 		const limit = strings.temp.gifLimit;
+		let newIndex;
 		const buttonId = interaction.component.customId;
 		switch (buttonId) {
 			case 'prevGif':
-				interaction.editReply('prevGif was pressed');
-				break;
-			case 'confirmGif':
-				interaction.update('confirmGif was pressed.');
-				break;
-			case 'nextGif':
-				let newIndex;
-				if (index < limit) {
-					newIndex = index + 1;
-					strings.temp.gifIndex = newIndex;
-				}
-				if (index == 0) {
-					// Previous GIF button
-					const prevButton = new MessageButton().setCustomId('previousGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled(false);
-					// Confirm GIF Button
+				newIndex = index - 1;
+				strings.temp.gifIndex = newIndex;
+				// If we're leaving the last GIF, enable the Next GIF button
+				if (index == limit) {
+					// Re-Send Previous GIF button
+					const prevButton = new MessageButton().setCustomId('prevGif').setLabel('Previous GIF').setStyle('SECONDARY');
+					// Re-Send Confirm GIF Button
 					const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY');
-					// Next GIF Button
+					// Enable Next GIF Button
 					const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY');
-					// Cancel Button
+					// Re-Send Cancel Button
 					const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Cancel').setStyle('DANGER');
 					// Put all the above into an ActionRow to be sent as a component of the reply
 					const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
@@ -89,14 +82,72 @@ client.on('interactionCreate', async interaction => {
 					interaction.update({ content: strings.temp.gifs[newIndex].embed_url, components: [row] });
 					break;
 				}
-				if (newIndex == strings.temp.gifLimit) {
-					// Previous GIF button
-					const prevButton = new MessageButton().setCustomId('previousGif').setLabel('Previous GIF').setStyle('SECONDARY');
-					// Confirm GIF Button
+				// If we're going into the first GIF, disable the Previous GIF button
+				if (newIndex == 0) {
+					// Disable Previous GIF button
+					const prevButton = new MessageButton().setCustomId('prevGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled();
+					// Re-Send Confirm GIF Button
 					const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY');
-					// Next GIF Button
+					// Re-Send  Next GIF Button
+					const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY');
+					// Re-Send Cancel Button
+					const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Canceled').setStyle('DANGER');
+					// Put all the above into an ActionRow to be sent as a component of the reply
+					const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
+
+					interaction.update({ content: strings.temp.gifs[newIndex].embed_url, components: [row] });
+					break;
+				}
+
+				interaction.update(strings.temp.gifs[newIndex].embed_url);
+				break;
+			case 'confirmGif':
+				interaction.update({ content: 'GIF Confirmed, what should I save it as?\n(*don\'t* include the .gif)', components: [] });
+				const collector = fn.collect.gifName(interaction);
+				collector.on('collect', m => {
+					const gifData = {
+						name: m.content.toLowerCase(),
+						embed_url: strings.temp.gifs[strings.temp.gifIndex].embed_url,
+					};
+					fn.upload.gif(gifData).then(res => {
+						m.reply(`I've saved the GIF as ${gifData.name}.gif`);
+						fn.startup.getGifFiles(interaction.client);
+					}).catch(err => {
+						m.reply('Sorry, there was a problem saving the GIF.');
+						console.error(err);
+					});
+					collector.stop('success');
+				});
+				fn.startup.getGifFiles(interaction.client);
+				break;
+			case 'nextGif':
+				newIndex = index + 1;
+				strings.temp.gifIndex = newIndex;
+				// If we're leaving the first GIF, enable the Previous GIF button
+				if (index == 0) {
+					// Enable Previous GIF button
+					const prevButton = new MessageButton().setCustomId('prevGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled(false);
+					// Re-Send Confirm GIF Button
+					const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY');
+					// Re-Send Next GIF Button
+					const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY');
+					// Re-Send Cancel Button
+					const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Cancel').setStyle('DANGER');
+					// Put all the above into an ActionRow to be sent as a component of the reply
+					const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
+
+					interaction.update({ content: strings.temp.gifs[newIndex].embed_url, components: [row] });
+					break;
+				}
+				// If we're going into the last GIF, disable the Next GIF button
+				if (newIndex == strings.temp.gifLimit) {
+					// Re-Send Previous GIF button
+					const prevButton = new MessageButton().setCustomId('prevGif').setLabel('Previous GIF').setStyle('SECONDARY');
+					// Re-Send Confirm GIF Button
+					const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY');
+					// Disable  Next GIF Button
 					const nextButton = new MessageButton().setCustomId('nextGif').setLabel('Next GIF').setStyle('SECONDARY').setDisabled();
-					// Cancel Button
+					// Re-Send Cancel Button
 					const cancelButton = new MessageButton().setCustomId('cancelGif').setLabel('Canceled').setStyle('DANGER');
 					// Put all the above into an ActionRow to be sent as a component of the reply
 					const row = new MessageActionRow().addComponents(prevButton, confirmButton, nextButton, cancelButton);
@@ -109,7 +160,7 @@ client.on('interactionCreate', async interaction => {
 				break;
 			case 'cancelGif':
 				// Previous GIF button
-				const prevButton = new MessageButton().setCustomId('previousGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled();
+				const prevButton = new MessageButton().setCustomId('prevGif').setLabel('Previous GIF').setStyle('SECONDARY').setDisabled();
 				// Confirm GIF Button
 				const confirmButton = new MessageButton().setCustomId('confirmGif').setLabel('Confirm').setStyle('PRIMARY').setDisabled();
 				// Next GIF Button

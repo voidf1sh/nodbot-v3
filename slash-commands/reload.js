@@ -1,10 +1,17 @@
-const fn = require('../functions');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const fn = require('../functions.js');
 
 module.exports = {
-	name: 'reload',
-	description: 'Reload saved GIFs, Pastas, Joint Phrases, etc',
-	execute(message, file) {
-		fn.reload(message.client);
-		message.reply('Reload Successful');
-	}
-}
+	data: new SlashCommandBuilder()
+		.setName('reload')
+		.setDescription('Reload all saved content, useful if saving something fails.'),
+	async execute(interaction) {
+		fn.startup.getSlashCommands(client);
+		fn.startup.getDotCommands(client);
+		fn.startup.setvalidCommands(client);
+		fn.startup.getGifFiles(client);
+		fn.startup.getPastaFiles(client);
+		fn.startup.getPotPhrases(client);
+		interaction.reply('Reloaded!');
+	},
+};
