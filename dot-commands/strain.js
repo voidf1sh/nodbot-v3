@@ -6,6 +6,12 @@ module.exports = {
 	usage: '<strain name>.strain',
 	execute(message, commandData) {
 		commandData.strainName = fn.weed.strain.lookup(commandData.args, message.client);
-		fn.download.strain(commandData, message);
+		if (commandData.strainName) {
+			fn.download.strain(commandData, message);
+		}
+		else {
+			commandData.content = 'Sorry, I couldn\'t find a strain with that name: ' + commandData.args;
+			message.reply(fn.embeds.text(commandData));
+		}
 	}
 }

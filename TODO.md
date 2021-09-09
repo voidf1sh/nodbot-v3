@@ -5,7 +5,11 @@
 *  = Then pass confirmed-good strainName to fn.download.strain()
 *= Test all functions
 *  = Write out the process used to test functionality to standardize it.
+= Sanitize inputs
   = Don't forget to test apostrophes and newlines.
+  = Emoji break strain lookup
+  = Find a way to filter out URLs that may have .extensions at the end
+  = Mentions in .strain crash
 = Fix newline escaping in savepasta
 = Check what inputs need to be sanitized
 ! Name checking for saving content !

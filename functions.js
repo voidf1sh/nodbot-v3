@@ -412,7 +412,12 @@ const functions = {
 		strain: {
 			lookup(strainName, client) {
 				const strainSearcher = new FuzzySearch(client.strains.map(e => e.name));
-				return strainSearcher.search(strainName)[0];
+				const name = strainSearcher.search(strainName)[0];
+				if (name != undefined) {
+					return name;
+				} else {
+					return false;
+				}
 			},
 			submit(strainName) {
 				return strainName;
