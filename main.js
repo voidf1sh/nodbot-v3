@@ -28,12 +28,14 @@ const config = require('./config.json');
 const strings = require('./strings.json');
 
 client.once('ready', () => {
-	fn.startup.getSlashCommands(client);
-	fn.startup.getDotCommands(client);
-	fn.startup.setvalidCommands(client);
-	fn.startup.getGifFiles(client);
-	fn.startup.getPastaFiles(client);
-	fn.startup.getPotPhrases(client);
+	fn.collections.slashCommands(client);
+	fn.collections.dotCommands(client);
+	fn.collections.setvalidCommands(client);
+	fn.download.gifs(client);
+	fn.download.pastas(client);
+	fn.download.joints(client);
+	fn.download.requests(client);
+	fn.download.strains(client);
 	console.log('Ready!');
 	client.channels.fetch(config.devChannelId).then(channel => {
 		channel.send('Ready!');
@@ -110,16 +112,12 @@ client.on('interactionCreate', async interaction => {
 						name: m.content.toLowerCase(),
 						embed_url: strings.temp.gifs[strings.temp.gifIndex].embed_url,
 					};
-					fn.upload.gif(gifData).then(res => {
-						m.reply(`I've saved the GIF as ${gifData.name}.gif`);
-						fn.startup.getGifFiles(interaction.client);
-					}).catch(err => {
-						m.reply('Sorry, there was a problem saving the GIF.');
-						console.error(err);
-					});
+					fn.upload.gif(gifData, client);
+					m.reply(`I've saved the GIF as ${gifData.name}.gif`);
+					fn.download.gifs(interaction.client);
 					collector.stop('success');
 				});
-				fn.startup.getGifFiles(interaction.client);
+				fn.download.gifs(interaction.client);
 				break;
 			case 'nextGif':
 				newIndex = index + 1;

@@ -2,6 +2,11 @@
 // dotenv for handling environment variables
 const dotenv = require('dotenv');
 dotenv.config();
+// Assignment of environment variables
+const dbHost = process.env.dbHost;
+const dbUser = process.env.dbUser;
+const dbName = process.env.dbName;
+const dbPass = process.env.dbPass;
 
 // filesystem
 const fs = require('fs');
@@ -9,31 +14,28 @@ const fs = require('fs');
 // D.js
 const Discord = require('discord.js');
 
+// Fuzzy text matching for db lookups
+const FuzzySearch = require('fuzzy-search');
+
 // Various imports
 const config = require('./config.json');
 const strings = require('./strings.json');
 const slashCommandFiles = fs.readdirSync('./slash-commands/').filter(file => file.endsWith('.js'));
 const dotCommandFiles = fs.readdirSync('./dot-commands/').filter(file => file.endsWith('.js'));
 
-// PostgreSQL
-const pg = require('pg');
-const db = new pg.Client({
-	connectionString: process.env.DATABASE_URL,
-	// ssl: {
-	// 	rejectUnauthorized: false
-	// }
+// MySQL
+const mysql = require('mysql');
+const db = new mysql.createConnection({
+	host: dbHost,
+	user: dbUser,
+	password: dbPass,
+	database: dbName,
 });
 db.connect();
 
-module.exports = {
-	startup: {
-		setvalidCommands(client) {
-			for (const entry of client.dotCommands.map(command => command.name)) {
-				config.validCommands.push(entry);
-			}
-			if (config.isDev) console.log(config.validCommands);
-		},
-		getSlashCommands(client) {
+const functions = {
+	collections: {
+		slashCommands(client) {
 			if (!client.slashCommands) client.slashCommands = new Discord.Collection();
 			client.slashCommands.clear();
 			for (const file of slashCommandFiles) {
@@ -42,76 +44,91 @@ module.exports = {
 					client.slashCommands.set(slashCommand.data.name, slashCommand);
 				}
 			}
-			if (config.isDev) console.log(client.slashCommands);
+			if (config.isDev) console.log('Slash Commands Collection Built');
 		},
-		getDotCommands(client) {
+		setvalidCommands(client) {
+			for (const entry of client.dotCommands.map(command => command.name)) {
+				config.validCommands.push(entry);
+			}
+			if (config.isDev) console.log('Valid Commands Added to Config');
+		},
+		dotCommands(client) {
 			if (!client.dotCommands) client.dotCommands = new Discord.Collection();
 			client.dotCommands.clear();
 			for (const file of dotCommandFiles) {
 				const dotCommand = require(`./dot-commands/${file}`);
 				client.dotCommands.set(dotCommand.name, dotCommand);
 			}
-			if (config.isDev) console.log(client.dotCommands);
+			if (config.isDev) console.log('Dot Commands Collection Built');
 		},
-		getGifFiles(client) {
+		gifs(rows, client) {
 			if (!client.gifs) client.gifs = new Discord.Collection();
 			client.gifs.clear();
-			const query = 'SELECT name, embed_url FROM gifs';
-			return new Promise((resolve, reject) => {
-				db.query(query)
-					.then(res => {
-						for (const row of res.rows) {
-							const gif = {
-								name: row.name,
-								embed_url: row.embed_url
-							};
-							client.gifs.set(gif.name, gif);
-						}
-						resolve();
-					})
-					.catch(err => console.error(err));
-			});
+			for (const row of rows) {
+				const gif = {
+					id: row.id,
+					name: row.name,
+					embed_url: row.embed_url
+				};
+				client.gifs.set(gif.name, gif);
+			}
+			if (config.isDev) console.log('GIFs Collection Built');
 		},
-		getPotPhrases(client) {
-			if (!client.potphrases) client.potphrases = new Discord.Collection();
-			client.potphrases.clear();
-			const query = 'SELECT id, content FROM potphrases';
-			db.query(query)
-				.then(res => {
-					for (const row of res.rows) {
-						const potphrase = {
-							id: row.id,
-							content: row.content
-						};
-						client.potphrases.set(potphrase.id, potphrase);
-					}
-				})
-				.catch(err => console.error(err));
+		joints(rows, client) {
+			if (!client.joints) client.joints = new Discord.Collection();
+			client.joints.clear();
+			for (const row of rows) {
+				const joint = {
+					id: row.id,
+					content: row.content
+				};
+				client.joints.set(joint.id, joint);
+			}
+			if (config.isDev) console.log('Joints Collection Built');
 		},
-		getPastaFiles(client) {
+		pastas(rows, client) {
 			if (!client.pastas) client.pastas = new Discord.Collection();
 			client.pastas.clear();
-			const query = 'SELECT name, content, iconurl FROM pastas';
-			return new Promise((resolve, reject) => {
-				db.query(query)
-					.then(res => {
-						for (const row of res.rows) {
-							const pasta = {
-								name: row.name,
-								content: row.content,
-								iconUrl: row.iconurl
-							};
-							client.pastas.set(pasta.name, pasta);
-						}
-						resolve();
-					})
-					.catch(err => console.error(err));
-			});
+			for (const row of rows) {
+				const pasta = {
+					id: row.id,
+					name: row.name,
+					content: row.content,
+					iconUrl: row.iconurl,
+				};
+				client.pastas.set(pasta.name, pasta);
+			}
+			if (config.isDev) console.log('Pastas Collection Built');
 		},
+		requests(rows, client) {
+			if (!client.requests) client.requests = new Discord.Collection();
+			client.requests.clear();
+			for (const row of rows) {
+				const request = {
+					id: row.id,
+					author: row.author,
+					request: row.request,
+				};
+				client.requests.set(request.id, request);
+			}
+			if (config.isDev) console.log('Requests Collection Built');
+		},
+		strains(rows, client) {
+			if (!client.strains) client.strains = new Discord.Collection();
+			client.strains.clear();
+			for (const row of rows) {
+				const strain = {
+					id: row.id,
+					name: row.name,
+				};
+				client.strains.set(strain.name, strain);
+			}
+			if (config.isDev) console.log('Strains Collection Built');
+		}
 	},
 	dot: {
 		getCommandData(message) {
-			let commandData = {};
+			const commandData = {};
 			// Split the message content at the final instance of a period
 			const finalPeriod = message.content.lastIndexOf('.');
 			if (finalPeriod < 0) {
@@ -252,16 +269,20 @@ module.exports = {
 				.setTimestamp()
 				.setFooter(commandData.author);
 
+			const requestsArray = [];
+
 			for (const row of commandData.requests) {
-				requestsEmbed.addField(
-					`#${row.id} - ${row.author}`,
+				requestsArray.push(
+					`**#${row.id} - ${row.author}**`,
 					`Request: ${row.request}`
 				);
 			}
 
+			requestsEmbed.setDescription(requestsArray.join('\n'));
+
 			return { embeds: [requestsEmbed]};
 		},
-		strain(commandData) {
+		strain(commandData, message) {
 			const strainEmbed = new Discord.MessageEmbed()
 				.setAuthor(`${commandData.command} #${commandData.strainInfo.id}`)
 				.setTimestamp()
@@ -294,7 +315,7 @@ module.exports = {
 				},
 			]);
 
-			return { embeds: [ strainEmbed ]};
+			message.reply({ embeds: [ strainEmbed ]});
 		},
 	},
 	collect: {
@@ -304,46 +325,108 @@ module.exports = {
 		},
 	},
 	upload: {
-		request(commandData) {
+		request(commandData, client) {
 			const query = `INSERT INTO requests (author, request, status) VALUES ('${commandData.author}','${commandData.args}','Active')`;
-			return db.query(query);
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.download.requests(client);
+			});
 		},
-		pasta(pastaData) {
+		pasta(pastaData, client) {
 			const query = `INSERT INTO pastas (name, content) VALUES ('${pastaData.name}','${pastaData.content}')`;
-			return db.query(query);
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.download.pastas(client);
+			});
 		},
-		joint(content) {
-			const query = `INSERT INTO potphrases (content) VALUES ('${content}')`;
-			return db.query(query);
+		joint(content, client) {
+			const query = `INSERT INTO joints (content) VALUES ('${content}')`;
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.download.joints(client);
+			});
 		},
-		gif(gifData) {
+		gif(gifData, client) {
 			const query = `INSERT INTO gifs (name, embed_url) VALUES ('${gifData.name}', '${gifData.embed_url}')`;
-			return db.query(query);
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.download.gifs(client);
+			});
 		}
 	},
 	download: {
-		requests() {
-			const query = 'SELECT id, author, request FROM requests WHERE status = \'Active\'';
-			return db.query(query);
+		requests(client) {
+			const query = 'SELECT * FROM requests WHERE status = \'Active\' ORDER BY id ASC';
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.collections.requests(rows, client);
+			});
 		},
-		pastas() {
+		pastas(client) {
 			const query = 'SELECT * FROM pastas ORDER BY id ASC';
-			return db.query(query);
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.collections.pastas(rows, client);
+			});
 		},
-		gifs() {
+		gifs(client) {
 			const query = 'SELECT * FROM gifs ORDER BY id ASC';
-			return db.query(query);
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.collections.gifs(rows, client);
+			});
+		},
+		joints(client) {
+			const query = 'SELECT * FROM joints ORDER BY id ASC';
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.collections.joints(rows, client);
+			});
+		},
+		strain(commandData, message) {
+			const { strainName } = commandData;
+			const query = `SELECT id, name, type, effects, ailment, flavor FROM strains WHERE name = '${strainName}'`;
+			db.query(query, (err, rows, fields) => {
+				if (rows != undefined) {
+					commandData.strainInfo = {
+						id: `${rows[0].id}`,
+						name: `${rows[0].name}`,
+						type: `${rows[0].type}`,
+						effects: `${rows[0].effects}`,
+						ailments: `${rows[0].ailment}`,
+						flavor: `${rows[0].flavor}`,
+					};
+					functions.embeds.strain(commandData, message);
+				}
+			});
+		},
+		strains(client) {
+			const query = 'SELECT id, name FROM strains';
+			db.query(query, (err, rows, fields) => {
+				if (err) throw err;
+				functions.collections.strains(rows, client);
+			});
 		},
 	},
 	weed: {
 		strain: {
-			lookup(strainName) {
-				const query = `SELECT id, name, type, effects, ailment, flavor, similarity(name, '${strainName}') FROM strains ORDER BY 7 DESC LIMIT 1`;
-				return db.query(query);
+			lookup(strainName, client) {
+				const strainSearcher = new FuzzySearch(client.strains.map(e => e.name));
+				return strainSearcher.search(strainName)[0];
 			},
 			submit(strainName) {
 				return strainName;
 			}
 		}
-	}
+	},
+	// Parent-Level functions (miscellaneuous)
+	closeRequest(requestId, client) {
+		const query = `UPDATE requests SET status = 'Closed' WHERE id = ${requestId}`;
+		db.query(query, (err, rows, fields) => {
+			if (err) throw err;
+			functions.download.requests(client);
+		});
+	},
 };
+
+module.exports = functions;

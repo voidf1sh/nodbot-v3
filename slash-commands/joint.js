@@ -7,11 +7,11 @@ module.exports = {
 		.setName('joint')
 		.setDescription('Replies with a random cannabis-related quote.'),
 	async execute(interaction) {
-		let phrases = [];
-		for (const entry of interaction.client.potphrases.map(potphrase => potphrase.content)) {
-			phrases.push(entry);
+		let joints = [];
+		for (const entry of interaction.client.joints.map(joint => joint.content)) {
+			joints.push(entry);
 		}
-		const randIndex = Math.floor(Math.random() * phrases.length);
-		interaction.reply(`${phrases[randIndex]} ${emoji.joint}`);
+		const randIndex = Math.floor(Math.random() * joints.length);
+		interaction.reply(`${joints[randIndex]} ${emoji.joint}`);
 	},
 };

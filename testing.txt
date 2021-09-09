@@ -1,0 +1,23 @@
+[ NodBot v3 Testing Procedure ]
+
+/ping
+/help [Here | DMs]
+/gifs
+/pastas
+/joints
+/requests
+/savegif
+/savepasta
+/savejoint
+[ ! CREATE MANUAL ENTRIES IN ALL 4 DBs ! ]
+/reload
+
+/joint
+/truth
+
+nod.gif
+random.gif
+bush.pasta
+random.request
+
+[ TODO: Error handling testing ]

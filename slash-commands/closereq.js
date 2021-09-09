@@ -11,11 +11,7 @@ module.exports = {
 				.setRequired(true)),
 	async execute(interaction) {
 		const requestId = interaction.options.getString('requestid');
-		if (await fn.closeRequest(requestId)) {
-			interaction.reply(`Request #${requestId} closed.`);
-		}
-		else {
-			interaction.reply('I was unable to close the request.');
-		}
+		fn.closeRequest(requestId, interaction.client);
+		interaction.reply(`Request #${requestId} closed.`);
 	},
 };

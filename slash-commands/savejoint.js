@@ -11,8 +11,7 @@ module.exports = {
 				.setDescription('What is the phrase?')
 				.setRequired(true)),
 	async execute(interaction) {
-		fn.upload.joint(interaction.options.getString('joint-content'));
-		fn.startup.getPotPhrases(interaction.client);
+		fn.upload.joint(interaction.options.getString('joint-content'), interaction.client);
 		interaction.reply(`The joint has been rolled${emoji.joint}`);
 	},
 };

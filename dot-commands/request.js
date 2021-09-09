@@ -12,6 +12,6 @@ module.exports = {
 		message.client.users.fetch(process.env.ownerID).then(user => {
 			user.send(fn.embeds.text(commandData));
 		}).catch(error => { console.error(error); });
-		fn.upload.request(commandData);
-	}
-}
+		fn.upload.request(commandData, message.client);
+	},
+};
