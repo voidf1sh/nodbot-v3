@@ -38,7 +38,7 @@ client.once('ready', () => {
 	fn.download.strains(client);
 	console.log('Ready!');
 	client.channels.fetch(config.devChannelId).then(channel => {
-		channel.send('Ready!');
+		channel.send(`I'm ready! ${new Date().toISOString}`);
 	});
 });
 
