@@ -1,10 +1,10 @@
 [ v3.0.0 ]
-= Finish MySQL Migration
-  = Import strain names to a collection
-  = Implement fuzzy-search for strain lookup
-  = Then pass confirmed-good strainName to fn.download.strain()
-= Test all functions
-  = Write out the process used to test functionality to standardize it.
+*= Finish MySQL Migration
+*  = Import strain names to a collection
+*  = Implement fuzzy-search for strain lookup
+*  = Then pass confirmed-good strainName to fn.download.strain()
+*= Test all functions
+*  = Write out the process used to test functionality to standardize it.
   = Don't forget to test apostrophes and newlines.
 = Fix newline escaping in savepasta
 = Check what inputs need to be sanitized
